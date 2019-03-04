@@ -43,32 +43,42 @@ AppTabs.prototype.activateAndToggle = function (event) {
   event.preventDefault()
   var $currentToggler = event.target
   var $currentTogglerSiblings = this.$module.querySelectorAll('[href="' + $currentToggler.hash + '"]')
-  var $tabContainer = this.$module.querySelector($currentToggler.hash)
+  var $tabContainer
+
+  try {
+    $tabContainer = this.$module.querySelector($currentToggler.hash)
+  } catch (exception) {
+    if ((typeof console !== 'undefined' || typeof console.log !== 'undefined')) {
+      console.error('Invalid example ID given: + ' + exception)
+    }
+  }
   var isTabAlreadyOpen = $currentToggler.getAttribute('aria-expanded') === 'true'
 
-  if (isTabAlreadyOpen) {
-    $tabContainer.classList.add(tabContainerHiddenClass)
-    $tabContainer.setAttribute('aria-hidden', 'true')
-    nodeListForEach($currentTogglerSiblings, function ($tabToggler) {
-      $tabToggler.setAttribute('aria-expanded', 'false')
-      // desktop and mobile
-      $tabToggler.parentNode.classList.remove(tabsItemCurrentClass, headingItemCurrentClass)
-    })
-  } else {
-    // Reset tabs
-    this.resetTabs()
-    // make current active
-    $tabContainer.classList.remove(tabContainerHiddenClass)
-    $tabContainer.setAttribute('aria-hidden', 'false')
+  if ($tabContainer) {
+    if (isTabAlreadyOpen) {
+      $tabContainer.classList.add(tabContainerHiddenClass)
+      $tabContainer.setAttribute('aria-hidden', 'true')
+      nodeListForEach($currentTogglerSiblings, function ($tabToggler) {
+        $tabToggler.setAttribute('aria-expanded', 'false')
+        // desktop and mobile
+        $tabToggler.parentNode.classList.remove(tabsItemCurrentClass, headingItemCurrentClass)
+      })
+    } else {
+      // Reset tabs
+      this.resetTabs()
+      // make current active
+      $tabContainer.classList.remove(tabContainerHiddenClass)
+      $tabContainer.setAttribute('aria-hidden', 'false')
 
-    nodeListForEach($currentTogglerSiblings, function ($tabToggler) {
-      $tabToggler.setAttribute('aria-expanded', 'true')
-      if ($tabToggler.parentNode.classList.contains(tabsItemClass)) {
-        $tabToggler.parentNode.classList.add(tabsItemCurrentClass)
-      } else if ($tabToggler.parentNode.classList.contains(headingItemClass)) {
-        $tabToggler.parentNode.classList.add(headingItemCurrentClass)
-      }
-    })
+      nodeListForEach($currentTogglerSiblings, function ($tabToggler) {
+        $tabToggler.setAttribute('aria-expanded', 'true')
+        if ($tabToggler.parentNode.classList.contains(tabsItemClass)) {
+          $tabToggler.parentNode.classList.add(tabsItemCurrentClass)
+        } else if ($tabToggler.parentNode.classList.contains(headingItemClass)) {
+          $tabToggler.parentNode.classList.add(headingItemCurrentClass)
+        }
+      })
+    }
   }
 }
 // reset aria attributes to default and close the tab content container
